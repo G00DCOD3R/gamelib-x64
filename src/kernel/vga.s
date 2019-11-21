@@ -11,11 +11,15 @@ VGA_GC_INDEX = 0x3CE
 VGA_GC_DATA = 0x3CF
 VGA_AC_INDEX = 0x3C0
 VGA_AC_WRITE = 0x3C0
+
+VGA_PEL_MASK = 0x3C6
+VGA_PEL_WRITE = 0x3C8
+VGA_PEL_DATA = 0x3C9	
 	
 VGA_NUM_SEQ_REGS = 5
 VGA_NUM_CRTC_REGS = 25
 VGA_NUM_GC_REGS = 9
-VGA_NUM_AC_REGS = 21	
+VGA_NUM_AC_REGS = 21
 
 .file "src/kernel/vga.s"
 
@@ -183,3 +187,35 @@ vga_write_regs:
 
 	pop %rbx
 	ret
+
+# sets a single palette index
+# rdi - red (0-63)
+# rsi - green (0-63)
+# rdx - blue (0-63)
+# rcx - index (0-255)	
+vga_set_palette_index:
+
+	mov %rdx, %r8
+	
+	mov $0xFF, %al
+	mov $VGA_PEL_MASK, %dx
+	out %al, %dx
+	
+	mov %rcx, %rax
+	mov $VGA_PEL_WRITE, %dx
+	out %al, %dx
+
+	mov $VGA_PEL_DATA, %dx
+
+	mov %rdi, %rax
+	out %al, %dx
+
+	mov %rsi, %rax
+	out %al, %dx
+
+	mov %r8, %rax
+	out %al, %dx
+	
+	ret
+
+

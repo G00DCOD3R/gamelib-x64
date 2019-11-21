@@ -21,9 +21,6 @@ along with gamelib-x64. If not, see <http://www.gnu.org/licenses/>.
 .global putChar
 .global readKeyCode
 
-MODE2H_BACKUP = 0x120000
-MODE13H_BACKUP = 0x110000	
-
 .section .kernel
 
 # void setTimer(int16 reloadValue)
@@ -112,46 +109,42 @@ readKeyCode:
 	ret
 
 # void switchToMode13h()
+#	
 # Switches the video mode to 13h (320x200 256 colors) as outlined by the
-# VGA standard. Before it does so, it backs up 64 kb from 0xA0000 into
-# 0x100000. It restores 64 kb from 0x110000 into 0xA0000.
+# VGA standard
 switchToMode13h:
-
+	
 	mov $m13h_regs, %rdi
 	call vga_write_regs
-
-	
-	
-	mov $0x4000, %rcx
-	mov $0xA0000, %rsi
-	mov $MODE2H_BACKUP, %rdi
-	rep movsq
-
-	mov $0x4000, %rcx
-	mov $MODE13H_BACKUP, %rsi
-	mov $0xA0000, %rdi
-	rep movsq
 	
 	ret
 
-# void switchToMode2h()
-# Switches to the default text mode. This is equivalent to mode 12h
-# (80x25 text) as defined by the VGA standard. Before it does so, it backs
-# up 64 kb from 0xA0000 into 0x110000. It restores 64 kb from 0x100000
-# into 0xA0000	
-switchToMode2h:	
-	mov $0x10000, %rcx
-	mov $0xA0000, %rsi
-	mov $MODE13H_BACKUP, %rdi
-	rep movsb
 
-	mov $0x10000, %rcx
-	mov $MODE2H_BACKUP, %rsi
-	mov $0xA0000, %rdi
-	rep movsb
+# void setPalette(int8 *data)
+#	
+# Sets the current video color palette. A palette consists of 256 groups
+# of bytes where the first one is red, the second green, and the third
+# blue. As such, 3 bytes represent one color in the palette (for a total
+# of 768) and each byte should have a value in the range of [0,63].
+setPalette:
+	push %rbx
+	push %r12
+	mov %rdi, %rbx
 
-	mov $m2h_regs, %rdi
-	call vga_write_regs
-	
+	mov $0, %r12
+
+1:	movb (%rbx), %dil
+	movb 1(%rbx), %sil
+	movb 2(%rbx), %dl
+	add $3, %rbx
+	mov %r12, %rcx
+	call vga_set_palette_index
+	inc %r12
+	cmp $256, %r12
+	jne 1b
+
+	pop %r12
+	pop %rbx
 	ret
+
 
