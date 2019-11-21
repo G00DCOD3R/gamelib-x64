@@ -31,7 +31,9 @@ gamelib-x64 provides a restricted set of functions to its users to handle common
 
  -  `void setTimer(int16 reloadValue)`: Changes the interrupt rate of the timer, and thus the frequency of the game loop.
  -   `void putChar(int8 x, int8 y, int8 char, int8 color)`: Prints a single character to the screen with a specified color at a specified location.
- -  `int8 readKeyCode()`: Reads and returns a single byte from the keyboard buffer.
+ -  `bool queryKeyCode(int8 keyCode)`: Returns whether the key corresponding to the code given is being pressed.
+ -  `void switchToMode13h()`: Switches the graphics mode to 13h (320x200 256 colors).
+ -  `void setPalette(int8 *data)` : Sets the current video color palette for mode 13h.
 
 In addition, your game should provide the following functions to hook into the gamelib-x64 framework:
 

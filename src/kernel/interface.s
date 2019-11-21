@@ -104,7 +104,9 @@ queryKeyCode:
 # void switchToMode13h()
 #	
 # Switches the video mode to 13h (320x200 256 colors) as outlined by the
-# VGA standard
+# VGA standard. Pixels should be written to the range 0xA0000-0xAFFFF.
+# Each byte corresponds to an index in the palette, indicating the color
+# of the pixel.
 switchToMode13h:
 	
 	mov $m13h_regs, %rdi
@@ -118,7 +120,7 @@ switchToMode13h:
 # Sets the current video color palette. A palette consists of 256 groups
 # of bytes where the first one is red, the second green, and the third
 # blue. As such, 3 bytes represent one color in the palette (for a total
-# of 768) and each byte should have a value in the range of [0,63].
+# of 768 bytes) and each byte should have a value in the range of [0,63].
 setPalette:
 	push %rbx
 	push %r12
