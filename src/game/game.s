@@ -30,8 +30,9 @@ gameInit:
 	ret
 
 gameLoop:
-	# Check if a key has been pressed
-	call	readKeyCode
+	# Check if the space key has been pressed
+	mov $0x39, %rdi
+	call	queryKeyCode
 	cmpq	$0, %rax
 	je		1f
 	# If so, print a 'Y'

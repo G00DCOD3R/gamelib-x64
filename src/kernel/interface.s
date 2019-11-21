@@ -87,23 +87,16 @@ putChar:
 
 
 
-# int8 readKeyCode()
+# bool readKeyCode(int8 keyCode)
 #
-# Reads a single byte from the keyboard buffer. If a byte could be read,
-# it is returned in the lowest 8 bits of the return value. Otherwise, 0
-# is returned. For information on how to interpret these bytes, look up
-# PS2 scan codes.
-readKeyCode:
+# Checks whether a key corresponding to a scan codeis currently being
+# pressed.
+queryKeyCode:
 	pushq	%rbp
 	movq	%rsp, %rbp
-
-	call	ps2_getkey
-	movq	$0, %rax
-	or		%r8, %r8
-	jz		1f
-	movzx	%r8b, %rax
-
-1:
+	mov $0, %rax
+	movb scan_buffer(%rdi), %al
+	
 	movq	%rbp, %rsp
 	popq	%rbp
 	ret
