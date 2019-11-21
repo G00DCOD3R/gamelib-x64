@@ -1,4 +1,25 @@
-.section .kernel.data
+/*
+This file is part of gamelib-x64.
+
+Copyright (C) 2019 Francisco Ayala Le Brun
+
+gamelib-x64 is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+gamelib-x64 is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with gamelib-x64. If not, see <http://www.gnu.org/licenses/>.
+*/
+
+// TODO: Add commands needed to switch back to text mode from mode 13h.
+// The register dump is already available, but a font must be loaded
+// into plane 4 among other things
 
 VGA_INSTAT_READ = 0x3DA
 	
@@ -23,6 +44,8 @@ VGA_NUM_AC_REGS = 21
 
 .file "src/kernel/vga.s"
 
+.section .kernel.data
+	
 .section .kernel
 	
 m13h_regs:	
