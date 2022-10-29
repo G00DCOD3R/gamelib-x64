@@ -30,7 +30,7 @@ keyboard_in_str:	.asciz "Keyboard in: %x\n"
 PS2_COMMAND	= 0x64
 PS2_DATA	= 0x60
 
-read_bytes:	.quad 0	# our "buffer"
+
 code_set1:	.byte 0, 0, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 0
 			.byte 0, 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', 0
 			.byte 0, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '\`'
@@ -40,7 +40,7 @@ code_set1:	.byte 0, 0, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=
 			.byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 			.byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 			.byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-
+scan_buffer:	.space 256
 .section .kernel
 
 init_ps2:
@@ -79,6 +79,13 @@ init_ps2:
 	mov		$ps2_init_done_str, %r8
 	#call	printf
 
+	# Clear scan code buffer
+	mov $255, %rcx
+1:	movb $0, scan_buffer(%rcx)
+	sub $1, %rcx
+	jnz 1b
+	
+
 	leave
 	ret
 
@@ -99,37 +106,28 @@ ps2_bottom_half:
 	enter	$0, $0
 	push	%rax
 
-	mov		$0, %rax
-	in		$PS2_DATA, %al
-	bt		$7, %rax			# TODO this way we only handle presses, not releases for now
-	jc		9f
-	mov		read_bytes, %rbx
-	shl		$8, %rbx
-	mov		%al, %bl
-	mov		%rbx, read_bytes
+1:	call 		ps2_process_scancode
 
-9:
-	pop		%rax
+	in 		$PS2_COMMAND, %al
+	test 		$0x1, %al
+	jnz 		1f # If there are still codes in the buffer, keep processing them
+
+	
+	pop	%rax
 	leave
 	ret
 
-ps2_getkey:
-	enter	$0, $0
-	push	%rax
-
-	mov		$0, %r8					# prepare an answer
-
-	mov		read_bytes, %rax		# TODO actually have a buffer
-	mov		%rax, %r8
-	and		$0xFF, %r8
-	cmp		$0, %r8
-	je		9f
-	shr		$8, %rax
-	mov		%rax, read_bytes
-
-9:
-	pop		%rax
-	leave
+ps2_process_scancode:
+	mov 		$0, %bl #value that we will write
+	mov		$0, %rax
+	in		$PS2_DATA, %al
+	bt		$7, %rax			
+	jc		1f
+	mov 		$1, %bl
+1:
+	and		$0x7F, %rax #deactive 7th bit
+	mov 		%bl, scan_buffer(%rax)
+	
 	ret
 
 ps2_translate_scancode:

@@ -84,24 +84,62 @@ putChar:
 	popq	%rbp
 	ret
 
-# int8 readKeyCode()
+
+
+
+# bool readKeyCode(int8 keyCode)
 #
-# Reads a single byte from the keyboard buffer. If a byte could be read,
-# it is returned in the lowest 8 bits of the return value. Otherwise, 0
-# is returned. For information on how to interpret these bytes, look up
-# PS2 scan codes.
-readKeyCode:
+# Checks whether a key corresponding to a scan codeis currently being
+# pressed.
+queryKeyCode:
 	pushq	%rbp
 	movq	%rsp, %rbp
-
-	call	ps2_getkey
-	movq	$0, %rax
-	or		%r8, %r8
-	jz		1f
-	movzx	%r8b, %rax
-
-1:
+	mov $0, %rax
+	movb scan_buffer(%rdi), %al
+	
 	movq	%rbp, %rsp
 	popq	%rbp
 	ret
+
+# void switchToMode13h()
+#	
+# Switches the video mode to 13h (320x200 256 colors) as outlined by the
+# VGA standard. Pixels should be written to the range 0xA0000-0xAFFFF.
+# Each byte corresponds to an index in the palette, indicating the color
+# of the pixel.
+switchToMode13h:
+	
+	mov $m13h_regs, %rdi
+	call vga_write_regs
+	
+	ret
+
+
+# void setPalette(int8 *data)
+#	
+# Sets the current video color palette. A palette consists of 256 groups
+# of bytes where the first one is red, the second green, and the third
+# blue. As such, 3 bytes represent one color in the palette (for a total
+# of 768 bytes) and each byte should have a value in the range of [0,63].
+setPalette:
+	push %rbx
+	push %r12
+	mov %rdi, %rbx
+
+	mov $0, %r12
+
+1:	movb (%rbx), %dil
+	movb 1(%rbx), %sil
+	movb 2(%rbx), %dl
+	add $3, %rbx
+	mov %r12, %rcx
+	call vga_set_palette_index
+	inc %r12
+	cmp $256, %r12
+	jne 1b
+
+	pop %r12
+	pop %rbx
+	ret
+
 
