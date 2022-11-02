@@ -129,8 +129,8 @@ ss_showWelcome:
     jne 1f
 
     movb $1, gameMode
-    call setup_panel
     call update_board
+    call setup_panel
     jmp 2f
     1:
     

@@ -181,7 +181,7 @@ gameLoop:
 
 	.nothingPressed:
 
-	// call update_board
+	call move_characters
 
 	ret
 
@@ -206,6 +206,7 @@ gameLoop:
 	inc %rax 
 	dec %rcx
 	jmp 1b 
+	2:
 
 	ret
 

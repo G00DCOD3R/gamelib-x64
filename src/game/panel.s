@@ -19,12 +19,10 @@ score_text:
 
 .section .game.text
 
-.global print_number
-
 # Subroutine prints captions that are constantly on panel during the game
 setup_panel:
     movq    $50, %rdi
-    movq    $50, %rsi
+    movq    $0, %rsi
 1:  movq    $0, %rcx
     movq    $0, %rdx
 
@@ -97,8 +95,6 @@ setup_panel:
     cmpq    $11, %rsi
     jne     1b
 
-
-
     ret
 
 # print_number(int x, int y, int num)
@@ -107,8 +103,7 @@ setup_panel:
 print_number:
     pushq   %rsi
     pushq   %rdi
-    movq    $0, %rax
-    movb    %dl, %al
+    movq    %rdx, %rax
 
     cmpq    $0, %rax
     je      case_0

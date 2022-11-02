@@ -4,25 +4,25 @@
 
 board_state:
 red_ghost:
-    .byte 0, 0 # ghost 1 - position (x, y)
+    .byte 0, 4 # ghost 1 - position (x, y)
 dir_red:
-    .byte 0
+    .byte 2
 blue_ghost:
-    .byte 0, 0 # ghost 2
+    .byte 0, 1 # ghost 2
 dir_blue:
-    .byte 0
+    .byte 2
 pink_ghost:
-    .byte 0, 0 # ghost 3
+    .byte 0, 2 # ghost 3
 dir_pink:
-    .byte 0
+    .byte 2
 green_ghost:
-    .byte 0, 0 # ghost 4
+    .byte 0, 3 # ghost 4
 dir_green:
-    .byte 0
+    .byte 2
 pac_man:
-    .byte 24, 13 # pac-man - position (x, y), direction (0 / 1 / 2 / 3)
+    .byte 2, 5 # pac-man - position (x, y), direction (0 / 1 / 2 / 3)
 dir_pacman:
-    .byte 1
+    .byte 2
 board: # 0 - nothing, 1 - wall, 2 - food
     .byte 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
     .byte 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1
@@ -97,10 +97,8 @@ char_of_pac_man:
         ret
 
 update_board:
-    mov $0, %rdi 
-    mov $50, %rsi 
-    mov $dir_pacman, %rdx 
-    call print_number
+    pushq   %rbp
+    movq    %rsp, %rbp
 
     movq    $0, %rdi
     movq    $0, %rsi
@@ -189,5 +187,57 @@ update_board:
     movq    $0x1e, %rcx
     call    putChar
 
+    movq    %rbp, %rsp
+    popq    %rbp
+
+    ret
+
+# Subroutine changes coordinates of ghosts and pacman and then
+# prints current state of the board
+move_characters:
+    movq    $board_state, %rax
+loop:
+    cmpb    $0, 2(%rax)
+    je      0f
+    cmpb    $1, 2(%rax)
+    je      1f
+    cmpb    $2, 2(%rax)
+    je      2f
+    cmpb    $3, 2(%rax)
+    je      3f
+0:  decq    (%rax)
+    jmp     4f
+1:  decq    1(%rax)
+    jmp     4f
+2:  incq    (%rax)
+    jmp     4f
+3:  incq    1(%rax)
+    jmp     4f
+4:  addq    $3, %rax
+    cmpq    $board, %rax
+    jne     loop
+
+    movq    $0, %rax
+    movq    $pac_man, %rcx
+    movb    1(%rcx), %al
+    movq    $50, %rdx
+    mulq    %rdx
+    movq    $0, %rdx
+    movb    (%rcx), %dl
+    addq    %rdx, %rax
+    addq    $board, %rax
+
+    cmpb    $2, (%rax)
+    jne     1f
+    movb    $0, (%rax)
+    movq    $score, %rax
+    addb    $1, (%rax)
+    movq    $58, %rdi
+    movq    $9, %rsi
+    movq    $0, %rdx
+    movb    score, %dl
+    call    print_number
+
+1:  call    update_board
     ret
     
