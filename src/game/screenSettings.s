@@ -82,11 +82,9 @@ ss_showWelcome:
     cmp $0, %rax        # if enter was pressed then rax != 0
     je 1f 
 
-    mov $0, %rdi 
-    mov $0, %rsi 
-    mov $'G', %rdx 
-    mov $0x07, %rcx 
-    call putChar
+
+    call .modeDecision  
+    jmp 2f
 
     1:
     mov $2, %rax 
@@ -125,3 +123,19 @@ ss_showWelcome:
     ret
 
 
+.modeDecision:
+
+    cmpb $0, .menuPosition 
+    jne 1f
+
+    movb $1, gameMode
+    call update_board
+    call setup_panel
+    jmp 2f
+    1:
+    
+    call optionNoChosen
+    2:
+
+
+    ret 

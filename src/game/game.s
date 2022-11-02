@@ -24,89 +24,190 @@ along with gamelib-x64. If not, see <http://www.gnu.org/licenses/>.
 
 .section .game.data
 
-.keysPressed: .quad 0
-.gameMode: .quad 0
-.spaceDelay: .quad 0
-.delayTicks: .quad 0xA
+.keysPressed: .byte 0
+gameMode: .byte 0
+.delayTicks: .byte 0x8
+.spaceDelay: .byte 0
+.UPDelay: .byte 0
+.DOWNDelay: .byte 0 
+.LEFTDelay: .byte 0 
+.RIGHTDelay: .byte 0 
   
 .section .game.text
 
 gameInit:
 
-	// mov $65535, %rdi 
-	// call setTimer
+	// push %r12
+	// sub $8, %rsp 
+	// mov $8, %r12 
+	// 1: 
+	// cmp $0, %r12 
+	// je 2f
+	// 	mov $10, %rdi 
+	// 	call random 
+	// 	mov %rax, %rdx 
+	// 	mov %r12, %rdi 
+	// 	mov %r12, %rsi 
+	// 	call print_number
 
-	// call    switchToMode13h
-    // movq    $colours_data, %rdi
-    // call    setPalette
+	// dec %r12 
+	// jmp 1b
+	// 2:
 	
-
+	// add $8, %rsp 
+	// pop %r12 
 
 	ret
 
 
 
 gameLoop:
-	mov $0, %rax 
-	mov %rax, .keysPressed
+
+	movb $0, .keysPressed		# keep track of every key that was pressed
+
+	call .decrementDelays		# decrement all delays that are nonzero
 
 	mov $0x1C, %rdi  			# check enter
 	call queryKeyCode 
-	mov .keysPressed, %rcx 
+	movb .keysPressed, %cl 
 	or %rcx, %rax
-	mov %rax, .keysPressed
+	movb %al, .keysPressed
+	cmpb $0, .keysPressed
+	jne .somethingPressed
 
-	mov  $0x39, %rdi 			# check space 
+	mov  $0x39, %rdi 			# check space (0x39)
 	call queryKeyCode 
 	shl $1, %rax
-	mov .spaceDelay, %rdx  
-	cmp $0, %rdx
-	jne 1f						# clicked once every .spaceDelay
+	movb .spaceDelay, %dl  
+	cmpb $0, %dl
+	jne 2f						# clicked once every .spaceDelay
 	cmp $0, %rax 				
 	je 2f						# .spaceDelay == 0 && rax == 0 --> jump
-	mov .delayTicks, %rdx 
-	mov %rdx, .spaceDelay		# reset counter
+	movb .delayTicks, %dl 
+	movb %dl, .spaceDelay		# reset counter
 	movb .keysPressed, %cl 
 	or %rcx, %rax 
-	mov %rax, .keysPressed
-	1:
-	mov .spaceDelay, %rax 
-	dec %rax
-	mov %rax, .spaceDelay
+	movb %al, .keysPressed
+	jmp .somethingPressed
 	2:
 
+
+	mov  $0x48, %rdi 			# check UP (0x48)
+	call queryKeyCode 
+	shl $3, %rax
+	movb .UPDelay, %dl  
+	cmpb $0, %dl
+	jne 2f						# clicked once every .UPDelay
+	cmp $0, %rax 				
+	je 2f						# .UPDelay == 0 && rax == 0 --> jump
+	movb .delayTicks, %dl 
+	movb %dl, .UPDelay		# reset counter
+	movb .keysPressed, %cl 
+	or %rcx, %rax 
+	movb %al, .keysPressed
+	jmp .somethingPressed
+	2:
 	
+	mov  $0x4B, %rdi 			# check LEFT (0x4B)
+	call queryKeyCode 
+	shl $2, %rax
+	movb .LEFTDelay, %dl  
+	cmpb $0, %dl
+	jne 2f						# clicked once every .LEFTDelay
+	cmp $0, %rax 				
+	je 2f						# .LEFTDelay == 0 && rax == 0 --> jump
+	movb .delayTicks, %dl 
+	movb %dl, .LEFTDelay		# reset counter
+	movb .keysPressed, %cl 
+	or %rcx, %rax 
+	movb %al, .keysPressed
+	jmp .somethingPressed
+	2:
 
-	// cmpb $0, .gameMode 
-	// jne 1f 
-	mov .keysPressed, %rdi 
+	mov  $0x4C, %rdi 			# check DOWN (0x4B)
+	call queryKeyCode 
+	shl $5, %rax
+	movb .DOWNDelay, %dl  
+	cmpb $0, %dl
+	jne 2f						# clicked once every .DOWNDelay
+	cmp $0, %rax 				
+	je 2f						# .DOWNDelay == 0 && rax == 0 --> jump
+	movb .delayTicks, %dl 
+	movb %dl, .DOWNDelay		# reset counter
+	movb .keysPressed, %cl 
+	or %rcx, %rax 
+	movb %al, .keysPressed
+	jmp .somethingPressed
+	2:
+
+
+	mov  $0x4D, %rdi 			# check RIGHT (0x4B)
+	call queryKeyCode 
+	shl $4, %rax
+	movb .RIGHTDelay, %dl  
+	cmpb $0, %dl
+	jne 2f						# clicked once every .RIGHTDelay
+	cmp $0, %rax 				
+	je 2f						# .RIGHTDelay == 0 && rax == 0 --> jump
+	movb .delayTicks, %dl 
+	movb %dl, .RIGHTDelay		# reset counter
+	movb .keysPressed, %cl 
+	or %rcx, %rax 
+	movb %al, .keysPressed
+	jmp .somethingPressed
+	2:
+
+
+	cmpb $0, gameMode 
+	jne .nothingPressed
+	.somethingPressed:
+
+	cmpb $0, gameMode 
+	jne 1f 
+	movb .keysPressed, %dil 
 	call ss_showWelcome
+	ret							# we have nothing to update, since we are in menu mode, thus returning now
 
-	// 1:
+	1:
+	// # we are in game mode 
+	
+	movb .keysPressed, %dil 
+	call updateDirection		# one of arrow keys was pressed, so update pacman's direction
 
-	// mov $0, %rdi 
-	// mov $0, %rsi 
-	// mov $'T', %rdx 
-	// mov $0x06, %rcx 
-	// call putChar
+	// mov $50, %rdi 
+	// mov $50, %rsi 
+	// mov dir_pacman, %rdx 
+	// call print_number
 
-// 	# Check if the space key has been pressed
-// 	mov $0x1C, %rdi
-// 	call	queryKeyCode
-// 	cmpq	$0, %rax
-// 	je		1f
-// 	# If so, print a 'Y'
-// 	movb	$'Y', %dl
-// 	jmp		2f
+	.nothingPressed:
 
-// 1:
-// 	# Otherwise, print a 'N'
-// 	movb	$'N', %dl
-
-// 2:
-// 	movq	$0, %rdi
-// 	movq	$0, %rsi
-// 	movb	$0x0f, %cl
-// 	call	putChar
+	call move_characters
 
 	ret
+
+
+
+
+.decrementDelays: 
+	mov $5, %rcx 
+	mov $.spaceDelay, %rax 
+
+	1: 
+	cmp $0, %rcx 
+	je 2f
+
+		cmpb $0, (%rax)
+		je 3f
+		movb (%rax), %dl 
+		dec %dl 
+		movb %dl, (%rax)
+		3:
+
+	inc %rax 
+	dec %rcx
+	jmp 1b 
+	2:
+
+	ret
+
+
