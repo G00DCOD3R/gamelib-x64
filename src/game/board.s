@@ -315,12 +315,12 @@ pac_man_death:
 die:
     call    init_board
     movb    score, %al
+    movb    $0, score
     movq    $high_score, %rcx
     cmpb    %al, (%rcx)
-    jl      1f
+    jg      1f
     movb    %al, (%rcx)
 1:  movb    $0, gameMode
-
     ret
 
 
