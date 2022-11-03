@@ -215,27 +215,6 @@ getCell:
 move_characters:
     push    %rbp
     mov     %rsp, %rbp
-    movq    $board_state, %rax
-loop:
-    cmpb    $0, 2(%rax)
-    je      0f
-    cmpb    $1, 2(%rax)
-    je      1f
-    cmpb    $2, 2(%rax)
-    je      2f
-    cmpb    $3, 2(%rax)
-    je      3f
-0:  decb    (%rax)
-    jmp     4f
-1:  decb    1(%rax)
-    jmp     4f
-2:  incb    (%rax)
-    jmp     4f
-3:  incb    1(%rax)
-    jmp     4f
-4:  addq    $3, %rax
-    cmpq    $pac_man, %rax
-    jne     loop
 
     movq    $pac_man, %rax
     movq    $0, %rdi
@@ -267,7 +246,31 @@ loop:
     movb    %dil, (%rax)
     movb    %sil, 1(%rax)
 
-5:  movq    $0, %rdi
+    call    pac_man_death
+
+5:  movq    $board_state, %rax
+loop:
+    cmpb    $0, 2(%rax)
+    je      0f
+    cmpb    $1, 2(%rax)
+    je      1f
+    cmpb    $2, 2(%rax)
+    je      2f
+    cmpb    $3, 2(%rax)
+    je      3f
+0:  decb    (%rax)
+    jmp     4f
+1:  decb    1(%rax)
+    jmp     4f
+2:  incb    (%rax)
+    jmp     4f
+3:  incb    1(%rax)
+    jmp     4f
+4:  addq    $3, %rax
+    cmpq    $pac_man, %rax
+    jne     loop
+
+    movq    $0, %rdi
     movq    $0, %rsi
     movq    $pac_man, %rcx
     movb    (%rcx), %dil
