@@ -46,7 +46,7 @@ board_end:
 init_board:
     movq    $board_start, %rax
     movq    $board_state, %rcx
-1:  cmpq    $board_end, %rcx
+1:  cmpq    $board_end, %rax
     je      1f
     movb    (%rax), %dl
     movb    %dl, (%rcx)
