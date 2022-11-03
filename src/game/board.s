@@ -266,10 +266,6 @@ loop:
     movq    $pac_man, %rax
     movb    %dil, (%rax)
     movb    %sil, 1(%rax)
-    movq    $51, %rdi
-    movq    $2, %rsi
-    movq    $12, %rdx
-    call print_number
 
 5:  movq    $0, %rdi
     movq    $0, %rsi
@@ -323,7 +319,7 @@ die:
     cmpb    %al, (%rcx)
     jl      1f
     movb    %al, (%rcx)
-1:  movb $0, gameMode
+1:  movb    $0, gameMode
 
     ret
 
