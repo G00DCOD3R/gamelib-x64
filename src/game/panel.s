@@ -3,7 +3,7 @@
 .section .game.data
 
 score:
-    .byte 12
+    .byte 0
 high_score:
     .byte 0
 digits:
@@ -21,6 +21,9 @@ score_text:
 
 # Subroutine prints captions that are constantly on panel during the game
 setup_panel:
+    push    %rbp
+    mov     %rsp, %rbp
+
     movq    $50, %rdi
     movq    $0, %rsi
 1:  movq    $0, %rcx
@@ -95,12 +98,28 @@ setup_panel:
     cmpq    $11, %rsi
     jne     1b
 
+    movq    $58, %rdi
+    movq    $9, %rsi
+    movq    $0, %rdx
+    call    print_number
+
+    movq    $63, %rdi
+    movq    $10, %rsi
+    movq    $0, %rdx
+    movb    high_score, %dl
+    call    print_number
+
+    mov     %rbp, %rsp
+    pop     %rbp
+
     ret
 
 # print_number(int x, int y, int num)
 # Subroutine prints a given number starting from given cell.
 # This does not work if a number is greater that 999!
 print_number:
+    push    %rbp
+    mov     %rsp, %rbp
     pushq   %rsi
     pushq   %rdi
     movq    %rdx, %rax
@@ -153,6 +172,10 @@ print_number:
     jne     1b
 
     addq    $16, %rsp
+
+    mov     %rbp, %rsp
+    pop     %rbp
+
     ret
 
 case_0:
@@ -162,4 +185,8 @@ case_0:
     movq    $48, %rdx
     call    putChar
     addq    $16, %rsp
+
+    mov     %rbp, %rsp
+    pop     %rbp
+
     ret

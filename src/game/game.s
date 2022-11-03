@@ -26,6 +26,8 @@ along with gamelib-x64. If not, see <http://www.gnu.org/licenses/>.
 
 .keysPressed: .byte 0
 gameMode: .byte 0
+.printingDelay: .byte 0x0
+.printingTicks: .byte 0x15
 .delayTicks: .byte 0x8
 .spaceDelay: .byte 0
 .UPDelay: .byte 0
@@ -181,7 +183,20 @@ gameLoop:
 
 	.nothingPressed:
 
+	cmpb $0, .printingDelay
+	jne 1f				# don't jump == we have to update board 
+
 	call move_characters
+	movb .printingTicks, %al 
+	movb %al, .printingDelay		# reset counter 
+	jmp 2f
+
+	1:					# we don't have to update our board yet
+	movb .printingDelay, %al 
+	dec %al 
+	movb %al, .printingDelay
+	2:
+
 
 	ret
 

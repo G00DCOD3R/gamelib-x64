@@ -19,6 +19,7 @@ random:
     rdtsc           # get current cpu timestamp 
     shr $4, %rax    # last bits 'not so random' according to post at answers.ewi
     mov -8(%rbp), %rdi 
+    mov $0, %rdx 
     div %rdi        # rdx = rax % rdi 
     mov %rdx, %rax  
 
