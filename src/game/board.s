@@ -52,6 +52,8 @@ board: # 0 - nothing, 1 - wall, 2 - food
 
 .section .game.text
 
+# colour_of_obj(int8 obj)
+# returns colour of the cell
 colour_of_obj:
     andb    $3, %dil
     cmpb    $1, %dil
@@ -67,6 +69,8 @@ colour_of_obj:
         movq    $0x16, %rax
         ret
 
+# char_of_obj(int8 obj)
+# returns character of the cell
 char_of_obj:
     andb    $3, %dil
     cmpb    $2, %dil
@@ -78,6 +82,9 @@ char_of_obj:
         movq    $'.', %rax
         ret
 
+# char_of_pac_man(int8 direction)
+# depending on the direction the subroutine returns character,
+# how pacman should be presented on the board
 char_of_pac_man:
     cmpb    $0, %dil
     je      left
@@ -98,6 +105,8 @@ char_of_pac_man:
         movq    $'>', %rax
         ret
 
+# update_board()
+# subroutine takes the state of board and prints the board on screen
 update_board:
     pushq   %rbp
     movq    %rsp, %rbp
@@ -296,6 +305,9 @@ loop:
     popq    %rbp
     ret
 
+# Subroutine checks whhether the pac-man has the same coordinates
+# as one of the ghosts. If so, it resets the board and score, puts
+# a new high score and changes the mode to menu mode
 pac_man_death:
     movq    $pac_man, %rax
     movq    $red_ghost, %rcx
