@@ -283,11 +283,11 @@ loop:
     jne     1f
     subb    $2, (%rax)
     movq    $score, %rax
-    addb    $1, (%rax)
+    addw    $1, (%rax)
     movq    $58, %rdi
     movq    $9, %rsi
     movq    $0, %rdx
-    movb    score, %dl
+    movw    score, %dx
     call    print_number
 
 1:  call    update_board
@@ -317,12 +317,12 @@ pac_man_death:
     ret
 die:
     call    init_board
-    movb    score, %al
-    movb    $0, score
+    movw    score, %ax
+    movw    $0, score
     movq    $high_score, %rcx
-    cmpb    %al, (%rcx)
+    cmpw    %ax, (%rcx)
     jg      1f
-    movb    %al, (%rcx)
+    movw    %ax, (%rcx)
 1:  movb    $0, gameMode
     ret
 

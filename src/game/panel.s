@@ -3,9 +3,9 @@
 .section .game.data
 
 score:
-    .byte 0
+    .word 0
 high_score:
-    .byte 0
+    .word 0
 digits:
     .skip 3
 
