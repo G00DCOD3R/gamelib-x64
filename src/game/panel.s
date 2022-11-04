@@ -117,6 +117,7 @@ setup_panel:
 # print_number(int x, int y, int num)
 # Subroutine prints a given number starting from given cell.
 # This does not work if a number is greater that 999!
+# Subroutine stores digits of number in digits
 print_number:
     push    %rbp
     mov     %rsp, %rbp
