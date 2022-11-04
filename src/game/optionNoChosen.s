@@ -2007,6 +2007,9 @@ other_welcome_screen:
 
 
 
+// user chose option NO on menu screen
+// overwrite menu screen so that he won't make same mistake again 
+
 optionNoChosen:
     mov $2000, %rax 
     mov $welcome_screen, %rcx 

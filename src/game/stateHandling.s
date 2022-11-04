@@ -6,6 +6,11 @@
 .global updateDirection
 
 
+// updates pacman direction
+// takes rdi as input --> keys that was pressed 
+// bits of keysPressed should be mapped as follows: 
+// enter, space, left, up, right, down
+// least significant bit, ..., most significant bit
 updateDirection:
     push %rbp 
     mov %rsp, %rbp 

@@ -2,6 +2,8 @@
 
 .section .game.data
 
+// the originial state of the board, so that we can overwrite current state
+// if pacman was eaten and new game is conducted 
 board_start:
     .byte 3, 3 # ghost 1 - position (x, y)
     .byte 2
@@ -43,6 +45,8 @@ board_end:
 
 .section .game.text
 
+
+// overwrites current board (board_state) with board_start (original board)
 init_board:
     movq    $board_start, %rax
     movq    $board_state, %rcx

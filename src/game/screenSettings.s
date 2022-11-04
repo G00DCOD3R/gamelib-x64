@@ -18,7 +18,7 @@
     movb %cl, (%rax)
     ret 
 
-
+// sets whole screen to default menu (welcome_screen)
 ss_clearScreen: 
     push %rbp 
     mov %rsp, %rbp 
@@ -122,6 +122,8 @@ ss_showWelcome:
     pop %rbp 
     ret
 
+// user chose option
+// evaluates what option it was and load appropriate subroutines 
 
 .modeDecision:
 

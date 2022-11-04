@@ -471,6 +471,9 @@ die:
     pop %rbp 
     ret 
 
+
+// popcount(rdi)
+// returns rax -> number of bits set to 1 in x
 popcount: 
     // mov $1, %rax 
     // ret

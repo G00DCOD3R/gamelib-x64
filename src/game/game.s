@@ -202,7 +202,8 @@ gameLoop:
 
 
 
-
+// decrement all key delays, so that we can distinguish between 
+// one click and multpiple clicks
 .decrementDelays: 
 	mov $5, %rcx 
 	mov $.spaceDelay, %rax 
